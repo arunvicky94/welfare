@@ -1,12 +1,10 @@
 angular
     .module('mean.fund')
-    .controller('FundController', function ($window, userService, fundService, $rootScope, $window) {
+    .controller('FundController', function ($window, fundService, MeanUser, $rootScope, $window) {
         var vm = this;
         vm.fundRequest = {};
-        alert("controller calling");
         vm.requestFund = function () {
-            console.log("controller calling")
-            fundService.fundRequest(vm.fundRequest)
+            fundService.fundRequest({fund: vm.fundRequest, user: MeanUser.user })
                 .then(function (response) {
                     alert("Your request sent succesfully")
                     vm.fundRequest = {};
@@ -18,7 +16,7 @@ angular
         }
         vm.getFundByUserId = function () {
             $rootScope.showNav = true;
-            fundService.getFundByUserId(vm.getUser()._id)
+            fundService.getFundByUserId(MeanUser.user._id)
                 .then(function (response) {
                     vm.funds = response.data;
                 }, function (error) {
@@ -26,12 +24,45 @@ angular
                     + error.status + " : " + error.statusText);
                 });
         }
-        vm.getUser = function () {
-            user = $window.localStorage['user-token'].split('.')[1];
-            user = $window.atob(user);
-            user = JSON.parse(user);
-            console.log(user);
-            return user;
+        vm.getFunds = function() {
+            fundService.getFunds()
+            .then(function(response){
+                vm.funds = response.data;
+            }, function(error){
+                alert("Unable to get fund details"
+                + " : " + error.status + " : " +  error.statusText);
+            });
+        }
+
+        vm.getFundsByStatus = function (status) {
+            $rootScope.showNav = true;
+            fundService.getFundsByStatus(status)
+            .then(function (response) {
+                vm.funds = response.data;
+            }, function (error) {
+                alert("Unable to get fund details" + " : "
+                + error.status + " : " + error.statusText);
+            });
+        }
+
+        vm.acceptFund = function (fund) {
+              fund.status = "Accept";
+            fundService.updateFund(fund)
+            .then(function(response){
+            }, function(error) {
+              alert("Unable to accept fund request. please try again"
+               + " : " + error.status + " : " +  error.statusText);
+            });
+        }
+
+        vm.rejectFund = function (fund) {
+            fund.status = "Reject";
+            fundService.updateFund(fund)
+            .then(function(response){
+            }, function(error){
+                alert("Unable to reject fund request. please try again"
+                + " : " + error.status + " : " +  error.statusText);
+            });
         }
 
     });

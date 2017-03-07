@@ -48,7 +48,12 @@ angular.module('mean.users')
         MeanUser.login(this.user);
       };
       $rootScope.$on("loggedin", function(e) {
-          $state.go('form');
+        if(MeanUser.isAdmin) {
+          $state.go('adminPage');
+        } else {
+          $state.go('funds');
+        }
+
       });
     }
   ])

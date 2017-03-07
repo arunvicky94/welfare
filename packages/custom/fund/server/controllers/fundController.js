@@ -6,8 +6,8 @@ var mongoose = require('mongoose');
 var Fund = mongoose.model('Fund');
 
 exports.requestFund = function (req, res) {
-    var fund = new Fund(req.fund);
-    // fund.user = req.body.user;
+    var fund = new Fund(req.body.fund);
+    fund.user = req.body.user;
     fund.date = new Date();
     fund.status = "pending";
 
@@ -23,7 +23,6 @@ exports.requestFund = function (req, res) {
             var currentMonth = new Date().getMonth();
         }
         if (lastMonth >= (currentMonth - 1)) {
-            console.log("You are not elligible for request fund");
             return res.status(404).json({
                 message: "You are not elligible for request fund"
             });
@@ -49,7 +48,6 @@ exports.updateFund = function (req, res) {
         },
         function (err, funds) {
             if (err) {
-                console.log("error while adding");
                 return res.json(400, err);
             }
             //  return res.json(funds).status(200);
